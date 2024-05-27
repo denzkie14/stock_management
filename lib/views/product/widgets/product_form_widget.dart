@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../../../controllers/product_controller.dart';
 import '../../../main.dart';
+import '../../../models/model_category.dart';
 import '../../../models/model_product.dart';
 import '../../../widgets/confirm_dialog.dart';
 
@@ -17,11 +20,11 @@ class ProductForm extends StatefulWidget {
 class _ProductFormState extends State<ProductForm> {
   final _formKey = GlobalKey<FormState>();
   late String _id;
-  late String _code;
+  //late String _code;
   late String _name;
   late String _unit;
   late int _categoryId;
-
+  final controller = Get.find<ProductController>();
   @override
   void initState() {
     super.initState();
@@ -57,17 +60,6 @@ class _ProductFormState extends State<ProductForm> {
                   },
                 ),
                 TextFormField(
-                  initialValue: _code,
-                  decoration: const InputDecoration(labelText: 'Code'),
-                  onSaved: (value) => _code = value!,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a code';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
                   initialValue: _name,
                   decoration: const InputDecoration(labelText: 'Name'),
                   onSaved: (value) => _name = value!,
@@ -89,17 +81,33 @@ class _ProductFormState extends State<ProductForm> {
                     return null;
                   },
                 ),
-                TextFormField(
-                  initialValue: _categoryId.toString(),
-                  decoration: const InputDecoration(labelText: 'Category ID'),
-                  keyboardType: TextInputType.number,
-                  onSaved: (value) => _categoryId = int.parse(value!),
+                DropdownButtonFormField<Category?>(
+                  value: controller.selectedCategory.value,
+                  hint: const Text('Select Category'),
+                  //  icon: Icon(Icons.arrow_downward),
+                  //   iconSize: 24,
+                  //  elevation: 16,
+                  // style: TextStyle(color: Colors.deepPurple),
+                  // underline: Container(
+                  //   height: 2,
+                  //   color: Colors.deepPurpleAccent,
+                  // ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a category ID';
+                    if (value == null) {
+                      return 'Please select category';
                     }
                     return null;
                   },
+                  onChanged: (value) {
+                    controller.selectedCategory.value = value;
+                  },
+                  items: controller.categoryList
+                      .map<DropdownMenuItem<Category>>((Category category) {
+                    return DropdownMenuItem<Category>(
+                      value: category,
+                      child: Text(category.description),
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 20),
                 Row(

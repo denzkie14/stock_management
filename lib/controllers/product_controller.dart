@@ -8,7 +8,7 @@ import '../constants/sql_connection.dart';
 class ProductController extends GetxController {
   var productList = <Product>[].obs;
   var categoryList = <Category>[].obs;
-
+  final selectedCategory = Rxn<Category>();
   @override
   onInit() async {
     super.onInit();
