@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:stock_management/models/model_category.dart';
@@ -9,6 +10,12 @@ class ProductController extends GetxController {
   var productList = <Product>[].obs;
   var categoryList = <Category>[].obs;
   final selectedCategory = Rxn<Category>();
+  final code = TextEditingController();
+  final name = TextEditingController();
+  final unit = TextEditingController();
+  final categoryId = TextEditingController();
+  String resultMessage = '';
+  bool hasError = false;
   @override
   onInit() async {
     super.onInit();
@@ -55,6 +62,44 @@ class ProductController extends GetxController {
     } finally {
       // Ensure the connection is closed
       await conn?.close();
+    }
+  }
+
+  var isLoading = false.obs;
+  insertProduct() async {
+    MySqlConnection? conn;
+    isLoading(true);
+    try {
+      conn = await MySqlConnection.connect(settings);
+
+      var result = await conn.query(
+        "INSERT INTO db_stocks.tbl_products (id, name, unit, category_id, is_deleted) VALUES('${code.text}','${name.text}','${unit.text}','${selectedCategory.value?.id}',0)",
+      );
+      print('Inserted row id: ${result}');
+
+      hasError = false;
+      resultMessage = 'Product added successfully.';
+    } on MySqlException catch (e) {
+      if (e.errorNumber == 1062) {
+        // Handle duplicate entry error
+        print('Duplicate entry error: ${e.message}');
+        resultMessage = 'Duplicate entry error: ${e.message}';
+      } else {
+        // Handle other MySQL errors
+        print('MySQL Error: ${e.message}');
+        resultMessage = 'MySQL Error: ${e.message}';
+      }
+      hasError = true;
+    } catch (e) {
+      print('Error: $e');
+      resultMessage = 'Error: ${e.toString()}';
+      hasError = true;
+    } finally {
+      // Ensure the connection is closed
+      await conn?.close();
+      isLoading(false);
+
+      loadProducts();
     }
   }
 

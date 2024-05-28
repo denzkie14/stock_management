@@ -5,6 +5,7 @@ import '../../../controllers/product_controller.dart';
 import '../../../main.dart';
 import '../../../models/model_category.dart';
 import '../../../models/model_product.dart';
+import '../../../widgets/alert_dialog.dart';
 import '../../../widgets/confirm_dialog.dart';
 
 class ProductForm extends StatefulWidget {
@@ -28,11 +29,15 @@ class _ProductFormState extends State<ProductForm> {
   @override
   void initState() {
     super.initState();
-    _id = widget.product == null ? '' : '';
+    controller.code.text = widget.product == null ? '' : '';
     //_code = widget.product?.code ?? '';
-    _name = widget.product?.name ?? '';
-    _unit = widget.product?.unit ?? '';
-    _categoryId = widget.product?.categoryId ?? 0;
+    controller.name.text = widget.product?.name ?? '';
+    controller.unit.text = widget.product?.unit ?? '';
+
+    if (widget.product != null) {
+      controller.selectedCategory.value = controller.categoryList
+          .firstWhere((e) => e.id == widget.product?.categoryId);
+    }
   }
 
   @override
@@ -48,19 +53,19 @@ class _ProductFormState extends State<ProductForm> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextFormField(
-                  initialValue: _id.toString(),
-                  decoration: const InputDecoration(labelText: 'ID'),
+                  controller: controller.code,
+                  decoration: const InputDecoration(labelText: 'Product Code'),
                   keyboardType: TextInputType.number,
                   onSaved: (value) => _id = value!,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter an ID';
+                      return 'Please enter an Product Code';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
-                  initialValue: _name,
+                  controller: controller.name,
                   decoration: const InputDecoration(labelText: 'Name'),
                   onSaved: (value) => _name = value!,
                   validator: (value) {
@@ -71,7 +76,7 @@ class _ProductFormState extends State<ProductForm> {
                   },
                 ),
                 TextFormField(
-                  initialValue: _unit,
+                  controller: controller.unit,
                   decoration: const InputDecoration(labelText: 'Unit'),
                   onSaved: (value) => _unit = value!,
                   validator: (value) {
@@ -128,16 +133,22 @@ class _ProductFormState extends State<ProductForm> {
                           final action = await showConfirmDialog(
                               navigatorKey.currentContext!,
                               'Save',
-                              _id == 0 ? 'Save new product?' : 'Save changes?');
+                              'Save changes?');
                           if (action) {
-                            _formKey.currentState!.save();
-                            widget.onSave(Product(
-                              id: _id,
-                              //   code: _code,
-                              name: _name,
-                              unit: _unit,
-                              categoryId: _categoryId,
-                            ));
+                            await controller.insertProduct();
+
+                            showAlertDialog(
+                                context,
+                                controller.hasError ? 'Error!' : 'Success!',
+                                controller.resultMessage);
+                            //   _formKey.currentState!.save();
+                            //   widget.onSave(Product(
+                            //     id: _id,
+                            //     //   code: _code,
+                            //     name: _name,
+                            //     unit: _unit,
+                            //     categoryId: _categoryId,
+                            //   ));
                           }
                         }
                       },
