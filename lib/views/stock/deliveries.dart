@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:stock_management/controllers/supplier_controller.dart';
-import 'package:stock_management/data/supplier_data_source.dart';
-import 'package:stock_management/models/model_supplier.dart';
-import 'package:stock_management/views/supplier/widgets/supplier_form_widget.dart';
+import 'package:stock_management/controllers/product_controller.dart';
 import 'package:stock_management/widgets/sidebar.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import '../../data/product_data_source.dart';
+import '../../models/model_product.dart';
+import '../product/widgets/product_form_widget.dart';
 
-class SupplierPage extends StatelessWidget {
-  SupplierPage({super.key});
-  final controller = Get.put(SupplierController());
-  final SupplierDataSource dataSource = SupplierDataSource();
-
-  void _showForm(context, {Supplier? item}) {
+class DeliveryPage extends StatelessWidget {
+  DeliveryPage({super.key});
+  final controller = Get.put(ProductController());
+  final ProductDataSource productDataSource = ProductDataSource();
+  void _showProductForm(context, {Product? product}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: SupplierForm(
-            data: item,
+          child: ProductForm(
+            product: product,
           ),
         );
       },
@@ -33,22 +32,22 @@ class SupplierPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Suppliers',
+          'Stock Deliveries',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
-              onPressed: () => controller.loadRecords(),
+              onPressed: () => controller.loadProducts(),
               icon: const Icon(Icons.refresh)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.search))
         ],
       ),
       drawer: const SideBar(),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add Supplier',
+        tooltip: 'New Delivery',
         backgroundColor: Colors.red,
         child: const Icon(color: Colors.white, Icons.add),
-        onPressed: () => _showForm(context),
+        onPressed: () => _showProductForm(context),
       ),
       body: Obx(() {
         return controller.isListLoading.value
@@ -56,7 +55,7 @@ class SupplierPage extends StatelessWidget {
                 child: CircularProgressIndicator(),
               )
             : SfDataGrid(
-                source: dataSource,
+                source: productDataSource,
                 columns: <GridColumn>[
                   GridColumn(
                     columnName: 'id',
@@ -64,46 +63,58 @@ class SupplierPage extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.centerLeft,
                       child: const Text(
-                        'ID',
+                        'Transaction #',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   GridColumn(
-                    columnName: 'name',
+                    columnName: 'Supplier',
                     columnWidthMode: ColumnWidthMode.auto,
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.centerLeft,
                       child: const Text(
-                        'Name',
+                        'suppler',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   GridColumn(
-                    columnName: 'address',
-                    label: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      alignment: Alignment.centerLeft,
-                      child: const Text(
-                        'Address',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  GridColumn(
-                    columnName: 'contactNumber',
-                    columnWidthMode: ColumnWidthMode.auto,
+                    columnName: 'Total Amount',
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.center,
                       child: const Text(
-                        'Contact Number',
+                        'amount',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
+                  GridColumn(
+                    visible: false,
+                    columnName: 'deliveryDate',
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'Delivery Date',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  // GridColumn(
+                  //   columnName: 'category',
+                  //   columnWidthMode: ColumnWidthMode.auto,
+                  //   label: Container(
+                  //     padding: const EdgeInsets.all(8.0),
+                  //     alignment: Alignment.centerLeft,
+                  //     child: const Text(
+                  //       'Category',
+                  //       style: TextStyle(fontWeight: FontWeight.bold),
+                  //     ),
+                  //   ),
+                  // ),
                   GridColumn(
                     columnName: 'actions',
                     label: Container(

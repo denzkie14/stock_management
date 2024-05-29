@@ -10,9 +10,8 @@ import '../../../widgets/confirm_dialog.dart';
 
 class ProductForm extends StatefulWidget {
   final Product? product;
-  final Function(Product) onSave;
 
-  ProductForm({this.product, required this.onSave});
+  ProductForm({this.product});
 
   @override
   _ProductFormState createState() => _ProductFormState();
@@ -29,7 +28,7 @@ class _ProductFormState extends State<ProductForm> {
   @override
   void initState() {
     super.initState();
-    controller.code.text = widget.product == null ? '' : '';
+    controller.code.text = widget.product?.id ?? '';
     //_code = widget.product?.code ?? '';
     controller.name.text = widget.product?.name ?? '';
     controller.unit.text = widget.product?.unit ?? '';
@@ -135,10 +134,22 @@ class _ProductFormState extends State<ProductForm> {
                               'Save',
                               'Save changes?');
                           if (action) {
-                            await controller.insertProduct();
-
+                            if (widget.product == null) {
+                              await controller.insertProduct();
+                            } else {
+                              Product updatetedProduct = Product(
+                                  id: controller.code.text,
+                                  name: controller.name.text,
+                                  unit: controller.unit.text,
+                                  categoryId:
+                                      controller.selectedCategory.value!.id);
+                              await controller.updateProduct(updatetedProduct);
+                            }
+                            Navigator.of(
+                              navigatorKey.currentContext!,
+                            ).pop();
                             showAlertDialog(
-                                context,
+                                navigatorKey.currentContext!,
                                 controller.hasError ? 'Error!' : 'Success!',
                                 controller.resultMessage);
                             //   _formKey.currentState!.save();

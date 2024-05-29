@@ -4,13 +4,14 @@ class Product {
   final String name;
   final String unit;
   final int categoryId;
-
+  String? category;
   Product({
     required this.id,
     //  required this.code,
     required this.name,
     required this.unit,
     required this.categoryId,
+    this.category,
   });
 
   // Factory method to create an Item from a map (e.g., from JSON)
@@ -21,6 +22,7 @@ class Product {
       name: map['name'],
       unit: map['unit'],
       categoryId: map['categoryId'],
+      category: map['category'],
     );
   }
 
@@ -32,23 +34,13 @@ class Product {
       'name': name,
       'unit': unit,
       'categoryId': categoryId,
+      'category': category
     };
   }
 
   // Optionally, you can override the toString method for better readability
   @override
   String toString() {
-    return 'Item{id: $id, name: $name, unit: $unit, categoryId: $categoryId}';
-  }
-
-  static getList() {
-    return List<Product>.generate(50, (index) {
-      return Product(
-          id: index.toString(),
-          //  code: 'code-$index',
-          name: 'Product $index',
-          unit: 'unit',
-          categoryId: 1);
-    }).toList();
+    return 'Item{id: $id, name: $name, unit: $unit, categoryId: $categoryId, category: $category}';
   }
 }

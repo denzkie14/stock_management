@@ -1,14 +1,14 @@
 class Supplier {
   final int id;
   final String name;
-  final String contactNumber;
-  final String address;
+  String? contactNumber;
+  String? address;
 
   Supplier({
     required this.id,
     required this.name,
-    required this.contactNumber,
-    required this.address,
+    this.contactNumber,
+    this.address,
   });
 
   // Factory method to create a Supplier from a map (e.g., from JSON)
@@ -16,7 +16,7 @@ class Supplier {
     return Supplier(
       id: map['id'],
       name: map['name'],
-      contactNumber: map['contactNumber'],
+      contactNumber: map['contact'],
       address: map['address'],
     );
   }
@@ -26,7 +26,7 @@ class Supplier {
     return {
       'id': id,
       'name': name,
-      'contactNumber': contactNumber,
+      'contact': contactNumber,
       'address': address,
     };
   }
@@ -34,6 +34,6 @@ class Supplier {
   // Optionally, you can override the toString method for better readability
   @override
   String toString() {
-    return 'Supplier{id: $id, name: $name, contactNumber: $contactNumber, address: $address}';
+    return 'Supplier{id: $id, name: $name, contact: $contactNumber, address: $address}';
   }
 }

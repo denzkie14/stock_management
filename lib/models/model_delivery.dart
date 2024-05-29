@@ -1,9 +1,11 @@
 import 'model_item.dart';
 
 class Delivery {
-  final int id;
+  final String id;
   final int supplierId;
-  final List<Item> items;
+  String? supplier;
+  final String deliveryNumber;
+  List<Item>? items;
   final DateTime deliveryDate;
   final String createdBy;
   final bool isDeleted;
@@ -11,8 +13,10 @@ class Delivery {
   Delivery({
     required this.id,
     required this.supplierId,
-    required this.items,
+    this.supplier,
+    this.items,
     required this.deliveryDate,
+    required this.deliveryNumber,
     required this.createdBy,
     required this.isDeleted,
   });
@@ -21,11 +25,13 @@ class Delivery {
   factory Delivery.fromMap(Map<String, dynamic> map) {
     return Delivery(
       id: map['id'],
-      supplierId: map['supplierId'],
+      supplierId: map['supplier_id'],
+      supplier: map['supplier'],
       items: List<Item>.from(map['items'].map((item) => Item.fromMap(item))),
-      deliveryDate: DateTime.parse(map['deliveryDate']),
+      deliveryNumber: map['delivery_number'],
+      deliveryDate: DateTime.parse(map['date_delivered']),
       createdBy: map['createdBy'],
-      isDeleted: map['isDeleted'],
+      isDeleted: map['is_cancelled'],
     );
   }
 
@@ -33,11 +39,13 @@ class Delivery {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'supplierId': supplierId,
-      'items': items.map((item) => item.toMap()).toList(),
-      'deliveryDate': deliveryDate.toIso8601String(),
+      'supplier_id': supplierId,
+      'supplier': supplier,
+      'items': items?.map((item) => item.toMap()).toList(),
+      'date_delivered': deliveryDate.toIso8601String(),
+      'delivery_number': deliveryNumber,
       'createdBy': createdBy,
-      'isDeleted': isDeleted,
+      'is_cancelled': isDeleted,
     };
   }
 

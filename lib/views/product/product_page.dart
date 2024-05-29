@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -12,7 +14,7 @@ import 'widgets/product_form_widget.dart';
 class ProductPage extends StatelessWidget {
   ProductPage({super.key});
   final controller = Get.put(ProductController());
-
+  final ProductDataSource productDataSource = ProductDataSource();
   void _showProductForm(context, {Product? product}) {
     showDialog(
       context: context,
@@ -23,17 +25,6 @@ class ProductPage extends StatelessWidget {
           ),
           child: ProductForm(
             product: product,
-            onSave: (Product newProduct) {
-              if (product == null) {
-                //   products.add(newProduct);
-              } else {
-                //  final index = products.indexOf(product);
-                //  products[index] = newProduct;
-              }
-              //  productDataSource = ProductDataSource(products);
-
-              Navigator.of(context).pop();
-            },
           ),
         );
       },
@@ -42,12 +33,18 @@ class ProductPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProductDataSource productDataSource =
-        ProductDataSource(controller.productList);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product List'),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.search))],
+        title: const Text(
+          'Product List',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(
+              onPressed: () => controller.loadProducts(),
+              icon: const Icon(Icons.refresh)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.search))
+        ],
       ),
       drawer: const SideBar(),
       floatingActionButton: FloatingActionButton(
@@ -56,77 +53,86 @@ class ProductPage extends StatelessWidget {
         child: const Icon(color: Colors.white, Icons.add),
         onPressed: () => _showProductForm(context),
       ),
-      body: SfDataGrid(
-        source: productDataSource,
-        columns: <GridColumn>[
-          GridColumn(
-            columnName: 'id',
-            label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: const Text(
-                'ID',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          // GridColumn(
-          //   columnName: 'code',
-          //   label: Container(
-          //     padding: const EdgeInsets.all(8.0),
-          //     alignment: Alignment.center,
-          //     child: const Text(
-          //       'Code',
-          //       style: TextStyle(fontWeight: FontWeight.bold),
-          //     ),
-          //   ),
-          // ),
-          GridColumn(
-            columnName: 'name',
-            label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: const Text(
-                'Name',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          GridColumn(
-            columnName: 'unit',
-            label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: const Text(
-                'Unit',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          GridColumn(
-            columnName: 'categoryId',
-            label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: const Text(
-                'Category ID',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          GridColumn(
-            columnName: 'actions',
-            label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: const Text(
-                'Actions',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          )
-        ],
-      ),
+      body: Obx(() {
+        return controller.isListLoading.value
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : SfDataGrid(
+                source: productDataSource,
+                columns: <GridColumn>[
+                  GridColumn(
+                    columnName: 'id',
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.centerLeft,
+                      child: const Text(
+                        'ID',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'name',
+                    columnWidthMode: ColumnWidthMode.auto,
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.centerLeft,
+                      child: const Text(
+                        'Name',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'unit',
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'Unit',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    visible: false,
+                    columnName: 'categoryId',
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'Category ID',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'category',
+                    columnWidthMode: ColumnWidthMode.auto,
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.centerLeft,
+                      child: const Text(
+                        'Category',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'actions',
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'Actions',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  )
+                ],
+              );
+      }),
     );
   }
 }

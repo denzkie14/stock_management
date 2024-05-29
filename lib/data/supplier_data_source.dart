@@ -2,7 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stock_management/controllers/product_controller.dart';
+import 'package:stock_management/controllers/supplier_controller.dart';
+import 'package:stock_management/models/model_supplier.dart';
 import 'package:stock_management/views/product/widgets/product_form_widget.dart';
+import 'package:stock_management/views/supplier/widgets/supplier_form_widget.dart';
 import 'package:stock_management/widgets/alert_dialog.dart';
 import 'package:stock_management/widgets/confirm_dialog.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -10,41 +13,42 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../main.dart';
 import '../models/model_product.dart';
 
-class ProductDataSource extends DataGridSource {
-  final ProductController controller = Get.find<ProductController>();
+class SupplierDataSource extends DataGridSource {
+  final SupplierController controller = Get.find<SupplierController>();
 
-  ProductDataSource() {
-    controller.productList.listen((products) {
-      updateDataSource(products);
+  SupplierDataSource() {
+    controller.list.listen((items) {
+      updateDataSource(items);
     });
-    _updateProductRows(controller.productList);
+    _updateProductRows(controller.list);
   }
 
-  List<DataGridRow> _products = [];
+  List<DataGridRow> _items = [];
 
-  void _updateProductRows(List<Product> products) {
-    _products = products.map<DataGridRow>((product) {
+  void _updateProductRows(List<Supplier> items) {
+    _items = items.map<DataGridRow>((item) {
       return DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'id', value: product.id),
-        DataGridCell<String>(columnName: 'name', value: product.name),
-        DataGridCell<String>(columnName: 'unit', value: product.unit),
-        DataGridCell<int>(columnName: 'categoryId', value: product.categoryId),
-        DataGridCell<String>(columnName: 'category', value: product.category),
+        DataGridCell<int>(columnName: 'id', value: item.id),
+        DataGridCell<String>(columnName: 'name', value: item.name),
+        DataGridCell<String>(columnName: 'address', value: item.address),
+        DataGridCell<String>(
+            columnName: 'contactNumber', value: item.contactNumber),
       ]);
     }).toList();
   }
 
-  void updateDataSource(List<Product> products) {
-    _updateProductRows(products);
+  void updateDataSource(List<Supplier> items) {
+    _updateProductRows(items);
     notifyListeners();
   }
 
   @override
-  List<DataGridRow> get rows => _products;
+  List<DataGridRow> get rows => _items;
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
-    final Product product = dataGridRowToProduct(row);
+    final Supplier record =
+        controller.list.firstWhere((e) => e.id == row.getCells()[0].value);
     return DataGridRowAdapter(cells: [
       Container(
         alignment: Alignment.centerLeft,
@@ -57,7 +61,7 @@ class ProductDataSource extends DataGridSource {
         child: Text(row.getCells()[1].value.toString()),
       ),
       Container(
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         padding: const EdgeInsets.all(8.0),
         child: Text(row.getCells()[2].value.toString()),
       ),
@@ -67,11 +71,6 @@ class ProductDataSource extends DataGridSource {
         child: Text(row.getCells()[3].value.toString()),
       ),
       Container(
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.all(8.0),
-        child: Text(row.getCells()[4].value.toString()),
-      ),
-      Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -79,7 +78,7 @@ class ProductDataSource extends DataGridSource {
             IconButton(
               tooltip: 'Update',
               onPressed: () {
-                update(product);
+                update(record);
               },
               icon: const Icon(Icons.edit),
               color: Colors.green,
@@ -87,7 +86,7 @@ class ProductDataSource extends DataGridSource {
             IconButton(
               tooltip: 'Delete',
               onPressed: () async {
-                delete(product);
+                delete(record);
               },
               icon: const Icon(Icons.delete),
               color: Colors.red,
@@ -98,7 +97,7 @@ class ProductDataSource extends DataGridSource {
     ]);
   }
 
-  void update(Product product) async {
+  void update(Supplier item) async {
     showDialog(
         context: navigatorKey.currentContext!,
         builder: (BuildContext context) {
@@ -106,34 +105,24 @@ class ProductDataSource extends DataGridSource {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            child: ProductForm(
-              product: product,
+            child: SupplierForm(
+              data: item,
             ),
           );
         });
   }
 
-  void delete(Product product) async {
+  void delete(Supplier item) async {
     var action = await showConfirmDialog(
         navigatorKey.currentContext!,
-        'Delete Product',
-        'Are you sure you want to delete ${product.name} with product code: ${product.id}?');
+        'Delete Record',
+        'Are you sure you want to delete ${item.name} with Record ID: ${item.id}?');
     if (action) {
-      await controller.deleteProduct(product.id);
+      await controller.deleteRecord(item.id);
       showAlertDialog(
           navigatorKey.currentContext!,
           controller.hasError ? 'Error!' : 'Success!',
           controller.resultMessage);
     }
-  }
-
-  Product dataGridRowToProduct(DataGridRow row) {
-    return Product(
-      id: row.getCells()[0].value,
-      name: row.getCells()[1].value,
-      unit: row.getCells()[2].value,
-      categoryId: row.getCells()[3].value,
-      category: row.getCells()[4].value,
-    );
   }
 }
