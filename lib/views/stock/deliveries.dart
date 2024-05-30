@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:stock_management/controllers/product_controller.dart';
+import 'package:stock_management/controllers/delivery_controller.dart';
+import 'package:stock_management/data/deliveries_data_source.dart';
+import 'package:stock_management/models/model_delivery.dart';
 import 'package:stock_management/widgets/sidebar.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import '../../data/product_data_source.dart';
-import '../../models/model_product.dart';
-import '../product/widgets/product_form_widget.dart';
+import 'widgets/delivery_form_widget.dart';
 
 class DeliveryPage extends StatelessWidget {
   DeliveryPage({super.key});
-  final controller = Get.put(ProductController());
-  final ProductDataSource productDataSource = ProductDataSource();
-  void _showProductForm(context, {Product? product}) {
+  final controller = Get.put(DeliveryController());
+  final DeliveryDataSource dataSource = DeliveryDataSource();
+  void _showForm(context, {Delivery? data}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -19,8 +19,8 @@ class DeliveryPage extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: ProductForm(
-            product: product,
+          child: DeliveryForm(
+            data: data,
           ),
         );
       },
@@ -37,7 +37,7 @@ class DeliveryPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-              onPressed: () => controller.loadProducts(),
+              onPressed: () => controller.loadRecord(),
               icon: const Icon(Icons.refresh)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.search))
         ],
@@ -47,7 +47,7 @@ class DeliveryPage extends StatelessWidget {
         tooltip: 'New Delivery',
         backgroundColor: Colors.red,
         child: const Icon(color: Colors.white, Icons.add),
-        onPressed: () => _showProductForm(context),
+        onPressed: () => _showForm(context),
       ),
       body: Obx(() {
         return controller.isListLoading.value
@@ -55,10 +55,12 @@ class DeliveryPage extends StatelessWidget {
                 child: CircularProgressIndicator(),
               )
             : SfDataGrid(
-                source: productDataSource,
+                source: dataSource,
                 columns: <GridColumn>[
                   GridColumn(
                     columnName: 'id',
+                    //    columnWidthMode: ColumnWidthMode.auto,
+                    width: 220,
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.centerLeft,
@@ -69,31 +71,33 @@ class DeliveryPage extends StatelessWidget {
                     ),
                   ),
                   GridColumn(
-                    columnName: 'Supplier',
+                    columnName: 'supplier',
                     columnWidthMode: ColumnWidthMode.auto,
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.centerLeft,
                       child: const Text(
-                        'suppler',
+                        'Supplier',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   GridColumn(
-                    columnName: 'Total Amount',
+                    columnName: 'delivery_number',
+                    columnWidthMode: ColumnWidthMode.auto,
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
+                      alignment: Alignment.centerLeft,
                       child: const Text(
-                        'amount',
+                        'Delivery Number',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   GridColumn(
-                    visible: false,
-                    columnName: 'deliveryDate',
+                    // visible: false,
+                    columnWidthMode: ColumnWidthMode.auto,
+                    columnName: 'delivery_date',
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.center,
@@ -103,18 +107,6 @@ class DeliveryPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // GridColumn(
-                  //   columnName: 'category',
-                  //   columnWidthMode: ColumnWidthMode.auto,
-                  //   label: Container(
-                  //     padding: const EdgeInsets.all(8.0),
-                  //     alignment: Alignment.centerLeft,
-                  //     child: const Text(
-                  //       'Category',
-                  //       style: TextStyle(fontWeight: FontWeight.bold),
-                  //     ),
-                  //   ),
-                  // ),
                   GridColumn(
                     columnName: 'actions',
                     label: Container(

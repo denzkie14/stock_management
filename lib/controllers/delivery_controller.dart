@@ -6,43 +6,47 @@ import 'package:mysql1/mysql1.dart';
 import 'package:stock_management/models/model_category.dart';
 import 'package:stock_management/models/model_delivery.dart';
 import 'package:stock_management/models/model_product.dart';
+import 'package:stock_management/models/model_supplier.dart';
 
 import '../constants/sql_connection.dart';
 
 class DeliveryController extends GetxController {
   var deliveryList = <Delivery>[].obs;
-  var productList = <Product>[].obs;
-  var categoryList = <Category>[].obs;
-  final selectedCategory = Rxn<Category>();
-  final code = TextEditingController();
-  final name = TextEditingController();
-  final unit = TextEditingController();
-  final categoryId = TextEditingController();
+  var supplierList = <Supplier>[].obs;
+  final selectedSupplier = Rxn<Supplier>();
+
+  final id = TextEditingController();
+  final supplier = TextEditingController();
+  final deliveryNumber = TextEditingController();
+  final deliveryDate = TextEditingController();
+
+  //final categoryId = TextEditingController();
   String resultMessage = '';
   bool hasError = false;
   @override
   onInit() async {
     super.onInit();
-    loadDelivery();
+    loadRecord();
+    supplierList.value = await Supplier.suppliers();
     // loadProducts();
     //  testConnection();
     // categoryList.value = await Category.categories();
   }
 
   var isLoading = false.obs;
-  insertProduct() async {
+  insertRecord() async {
     MySqlConnection? conn;
     isLoading(true);
     try {
       conn = await MySqlConnection.connect(settings);
 
       var result = await conn.query(
-        "INSERT INTO db_stocks.tbl_products (id, name, unit, category_id, is_deleted) VALUES('${code.text}','${name.text}','${unit.text}','${selectedCategory.value?.id}',0)",
+        "INSERT INTO db_stocks.tbl_deliveries (id, supplier_id, delivery_number, date_delivered, is_cancelled) VALUES('${id.text}','${selectedSupplier.value?.id}','${deliveryNumber.text}','${deliveryDate.text}',0)",
       );
       print('Inserted row id: ${result}');
 
       hasError = false;
-      resultMessage = 'Product added successfully.';
+      resultMessage = 'Delivery added successfully.';
     } on MySqlException catch (e) {
       if (e.errorNumber == 1062) {
         // Handle duplicate entry error
@@ -67,14 +71,14 @@ class DeliveryController extends GetxController {
     }
   }
 
-  updateProduct(Product product) async {
+  updateRecord(Delivery item) async {
     MySqlConnection? conn;
     isLoading(true);
     try {
       conn = await MySqlConnection.connect(settings);
 
       var result = await conn.query(
-          "Update db_stocks.tbl_products set  name = '${product.name}', unit = '${product.unit}', category_id = '${product.categoryId}' where id = '${product.id}'");
+          "Update db_stocks.tbl_deliveries set supplier_id = '${item.supplierId}', delivery_number = '${item.deliveryNumber}', date_delivered = '${item.deliveryNumber}' where id = '${item.id}'");
 
       // var result = await conn.query(
       //     "UPDATE db_stocks.tbl_products SET name = ?, unit = ?, category_id = ? WHERE id = ?",
@@ -82,7 +86,7 @@ class DeliveryController extends GetxController {
 
       print('Updated row id: ${result}');
       hasError = false;
-      resultMessage = 'Product updated successfully.';
+      resultMessage = 'Delivery updated successfully.';
     } on MySqlException catch (e) {
       if (e.errorNumber == 1062) {
         // Handle duplicate entry error
@@ -107,19 +111,19 @@ class DeliveryController extends GetxController {
     }
   }
 
-  deleteProduct(String code) async {
+  deleteRecord(String code) async {
     MySqlConnection? conn;
     isLoading(true);
     try {
       conn = await MySqlConnection.connect(settings);
 
       var result = await conn.query(
-        "Update from db_stocks.tbl_products set is_deleted = 1 where id = $code",
+        "Update from db_stocks.tbl_deliveries set is_cancelled = 1 where id = $code",
       );
       print('Inserted row id: ${result}');
 
       hasError = false;
-      resultMessage = 'Product deleted successfully.';
+      resultMessage = 'Delivery deleted successfully.';
     } on MySqlException catch (e) {
       if (e.errorNumber == 1062) {
         // Handle duplicate entry error
@@ -145,7 +149,7 @@ class DeliveryController extends GetxController {
   }
 
   var isListLoading = false.obs;
-  loadDelivery() async {
+  loadRecord() async {
     isListLoading(true);
     final receivePort = ReceivePort();
     await Isolate.spawn(isolateLoadDelivery, receivePort.sendPort);

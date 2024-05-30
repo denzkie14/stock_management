@@ -1,3 +1,7 @@
+import 'package:mysql1/mysql1.dart';
+
+import '../constants/sql_connection.dart';
+
 class Supplier {
   final int id;
   final String name;
@@ -35,5 +39,37 @@ class Supplier {
   @override
   String toString() {
     return 'Supplier{id: $id, name: $name, contact: $contactNumber, address: $address}';
+  }
+
+  static Future<List<Supplier>> suppliers() async {
+    String query = 'SELECT * FROM db_Stocks.tbl_supplier';
+    List<Supplier> list = [];
+
+    MySqlConnection? conn;
+
+    try {
+      // Create a connection
+      conn = await MySqlConnection.connect(settings);
+      print('Database connection success...');
+
+      // Perform a query
+      var results = await conn.query(query);
+      print('Query executed successfully...');
+      results = await conn.query(query);
+      // Iterate through the results and create Category objects
+      list.clear();
+      for (var row in results) {
+        Supplier value = Supplier(
+            id: row[0], name: row[1], address: row[2], contactNumber: row[3]);
+        list.add(value);
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      // Ensure the connection is closed
+      await conn?.close();
+    }
+
+    return list;
   }
 }

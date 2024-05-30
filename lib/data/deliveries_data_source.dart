@@ -21,12 +21,12 @@ class DeliveryDataSource extends DataGridSource {
     _items = items.map<DataGridRow>((item) {
       return DataGridRow(cells: [
         DataGridCell<String>(columnName: 'id', value: item.id),
+        DataGridCell<String>(columnName: 'supplier', value: item.supplier),
         DataGridCell<String>(
             columnName: 'delivery_number', value: item.deliveryNumber),
-        DataGridCell<String>(columnName: 'supplier', value: item.supplier),
         DataGridCell<DateTime>(
             columnName: 'delivery_date', value: item.deliveryDate),
-        // DataGridCell<String>(columnName: 'category', value: item.category),
+        DataGridCell<String>(columnName: 'action', value: ""),
       ]);
     }).toList();
   }
@@ -51,11 +51,6 @@ class DeliveryDataSource extends DataGridSource {
       Container(
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.all(8.0),
-        child: Text(row.getCells()[1].value.toString()),
-      ),
-      Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(8.0),
         child: Text(row.getCells()[2].value.toString()),
       ),
       Container(
@@ -64,10 +59,15 @@ class DeliveryDataSource extends DataGridSource {
         child: Text(row.getCells()[3].value.toString()),
       ),
       Container(
-        alignment: Alignment.centerLeft,
+        alignment: Alignment.center,
         padding: const EdgeInsets.all(8.0),
         child: Text(row.getCells()[4].value.toString()),
       ),
+      // Container(
+      //   alignment: Alignment.centerLeft,
+      //   padding: const EdgeInsets.all(8.0),
+      //   child: Text(row.getCells()[4].value.toString()),
+      // ),
       Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.all(8.0),
