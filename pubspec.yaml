@@ -34,7 +34,8 @@ dependencies:
   get: ^4.6.6
   get_storage: ^2.1.1
   mysql1: ^0.20.0
-  syncfusion_flutter_datagrid: ^20.1.58
+  syncfusion_flutter_datagrid: ^25.2.6
+  syncfusion_flutter_datepicker: ^25.2.6
 
 dev_dependencies:
   flutter_lints: ^3.0.0
