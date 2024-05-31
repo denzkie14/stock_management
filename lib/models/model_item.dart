@@ -1,5 +1,8 @@
 class Item {
   final int id;
+  final String productId;
+  final String name;
+
   final num quantity;
   final num unitPrice;
   final num stockOnHand;
@@ -7,6 +10,8 @@ class Item {
   final DateTime expirationDate;
 
   Item({
+    required this.productId,
+    required this.name,
     required this.id,
     required this.quantity,
     required this.unitPrice,
@@ -24,6 +29,8 @@ class Item {
       stockOnHand: map['stockOnHand'],
       deliveryId: map['deliveryId'],
       expirationDate: DateTime.parse(map['expirationDate']),
+      productId: map['product_id'],
+      name: map['name'],
     );
   }
 
@@ -35,6 +42,8 @@ class Item {
       'unitPrice': unitPrice,
       'stockOnHand': stockOnHand,
       'deliveryId': deliveryId,
+      'product_id': productId,
+      'name': name,
       'expirationDate': expirationDate.toIso8601String(),
     };
   }

@@ -1,3 +1,7 @@
+import 'package:intl/intl.dart';
+import 'package:mysql1/mysql1.dart';
+
+import '../constants/sql_connection.dart';
 import 'model_item.dart';
 
 class Delivery {
@@ -53,5 +57,38 @@ class Delivery {
   @override
   String toString() {
     return 'Delivery{id: $id, supplierId: $supplierId, items: $items, deliveryDate: $deliveryDate, createdBy: $createdBy, isDeleted: $isDeleted}';
+  }
+
+  static Future<String> generateCode() async {
+    DateTime date = DateTime.now();
+    String query =
+        "SELECT count(*) FROM db_Stocks.tbl_deliveries where date_delivered = '${date.year}-${date.month}-${date.day}'";
+
+    MySqlConnection? conn;
+
+    String pre = DateFormat('yyyy-MM-dd').format(date);
+    int code = 0;
+    try {
+      // Create a connection
+      conn = await MySqlConnection.connect(settings);
+      print('Database connection success...');
+
+      // Perform a query
+      var results = await conn.query(query);
+      print('Query executed successfully...');
+      results = await conn.query(query);
+      // Iterate through the results and create Category objects
+
+      for (var row in results) {
+        code = row[0] + 1;
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      // Ensure the connection is closed
+      await conn?.close();
+    }
+    String formattedNumber = code.toString().padLeft(4, '0');
+    return '$pre-$formattedNumber';
   }
 }

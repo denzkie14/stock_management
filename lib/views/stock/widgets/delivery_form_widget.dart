@@ -1,5 +1,8 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:stock_management/controllers/delivery_controller.dart';
 import 'package:stock_management/models/model_delivery.dart';
 import 'package:stock_management/models/model_supplier.dart';
@@ -24,11 +27,43 @@ class _DeliveryFormState extends State<DeliveryForm> {
   @override
   void initState() {
     super.initState();
-    controller.id.text = widget.data?.id ?? '';
-    controller.supplier.text = widget.data?.supplierId.toString() ?? '';
-    controller.deliveryDate.text =
-        widget.data?.deliveryDate.toIso8601String() ?? '';
+
+    controller.id.text = widget.data?.id ?? controller.transactionNumber.value;
+
+    if (widget.data != null) {
+      controller.selectedSupplier.value = controller.supplierList
+          .firstWhere((s) => s.id == widget.data?.supplierId);
+
+      controller.deliveryDate.text =
+          DateFormat('yyyy-MM-dd').format(widget.data!.deliveryDate);
+    } else {
+      controller.selectedSupplier.value = null;
+      generateCode();
+      controller.deliveryDate.text =
+          DateFormat('yyyy-MM-dd').format(DateTime.now());
+    }
+
     controller.deliveryNumber.text = widget.data?.deliveryNumber ?? '';
+  }
+
+  generateCode() async {
+    await controller.generateTransactionCode();
+
+    controller.id.text = controller.transactionNumber.value;
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        controller.deliveryDate.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
   }
 
   @override
@@ -51,6 +86,7 @@ class _DeliveryFormState extends State<DeliveryForm> {
                   height: 16,
                 ),
                 TextFormField(
+                  readOnly: true,
                   controller: controller.id,
                   decoration: const InputDecoration(labelText: 'Transaction #'),
                   validator: (value) {
@@ -92,23 +128,28 @@ class _DeliveryFormState extends State<DeliveryForm> {
                   controller: controller.deliveryNumber,
                   decoration:
                       const InputDecoration(labelText: 'Delivery Number'),
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please enter a contact number';
-                  //   }
-                  //   return null;
-                  // },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a delivery number';
+                    }
+                    return null;
+                  },
                 ),
-                TextFormField(
-                  controller: controller.deliveryDate,
-                  decoration: const InputDecoration(labelText: 'Delivery Date'),
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please enter a contact number';
-                  //   }
-                  //   return null;
-                  // },
-                ),
+                GestureDetector(
+                    onTap: () => _selectDate(context),
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        controller: controller.deliveryDate,
+                        decoration:
+                            const InputDecoration(labelText: 'Delivery Date'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a delivery date';
+                          }
+                          return null;
+                        },
+                      ),
+                    )),
                 const SizedBox(
                   height: 16,
                 ),
@@ -135,13 +176,17 @@ class _DeliveryFormState extends State<DeliveryForm> {
                             if (widget.data == null) {
                               await controller.insertRecord();
                             } else {
-                              // Supplier updatetedRecord = Supplier(
-                              //   id: widget.data!.id,
-                              //   name: controller.name.text,
-                              //   address: controller.address.text,
-                              //   contactNumber: controller.contactNumber.text,
-                              // );
-                              // await controller.updateRecord(updatetedRecord);
+                              Delivery updatetedRecord = Delivery(
+                                  id: widget.data!.id,
+                                  supplierId: controller
+                                      .selectedSupplier.value?.id as int,
+                                  deliveryDate: DateTime.parse(
+                                      controller.deliveryDate.text),
+                                  deliveryNumber:
+                                      controller.deliveryNumber.text,
+                                  createdBy: '1',
+                                  isDeleted: false);
+                              await controller.updateRecord(updatetedRecord);
                             }
                             Navigator.of(
                               navigatorKey.currentContext!,

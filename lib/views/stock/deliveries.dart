@@ -11,6 +11,7 @@ class DeliveryPage extends StatelessWidget {
   DeliveryPage({super.key});
   final controller = Get.put(DeliveryController());
   final DeliveryDataSource dataSource = DeliveryDataSource();
+
   void _showForm(context, {Delivery? data}) {
     showDialog(
       context: context,
@@ -29,6 +30,8 @@ class DeliveryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.loadRecord();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -108,6 +111,7 @@ class DeliveryPage extends StatelessWidget {
                     ),
                   ),
                   GridColumn(
+                    width: 200,
                     columnName: 'actions',
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
