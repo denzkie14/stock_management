@@ -168,7 +168,10 @@ class SupplierController extends GetxController {
 
       for (var row in query) {
         Supplier value = Supplier(
-            id: row[0], name: row[1], address: row[2], contactNumber: row[3]);
+            id: row[0],
+            name: row[1],
+            address: row[2] ?? '',
+            contactNumber: row[3] ?? '');
         data.add(value);
       }
 

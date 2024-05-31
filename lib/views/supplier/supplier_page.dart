@@ -83,6 +83,7 @@ class SupplierPage extends StatelessWidget {
                   ),
                   GridColumn(
                     columnName: 'address',
+                    columnWidthMode: ColumnWidthMode.auto,
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.centerLeft,

@@ -75,7 +75,7 @@ class DeliveryPage extends StatelessWidget {
                   ),
                   GridColumn(
                     columnName: 'supplier',
-                    columnWidthMode: ColumnWidthMode.auto,
+                    columnWidthMode: ColumnWidthMode.lastColumnFill,
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.centerLeft,

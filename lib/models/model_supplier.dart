@@ -20,8 +20,8 @@ class Supplier {
     return Supplier(
       id: map['id'],
       name: map['name'],
-      contactNumber: map['contact'],
-      address: map['address'],
+      contactNumber: map['contact'] ?? '',
+      address: map['address'] ?? '',
     );
   }
 

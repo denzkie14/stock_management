@@ -56,7 +56,7 @@ class DeliveryController extends GetxController {
       conn = await MySqlConnection.connect(settings);
 
       var result = await conn.query(
-        "INSERT INTO db_stocks.tbl_deliveries (id, supplier_id, delivery_number, date_delivered, is_cancelled) VALUES('${id.text}','${selectedSupplier.value?.id}','${deliveryNumber.text}','${deliveryDate.text}',0)",
+        "INSERT INTO db_stocks.tbl_deliveries (id, supplier_id, delivery_number, date_delivered, is_cancelled, created_by) VALUES('${id.text}','${selectedSupplier.value?.id}','${deliveryNumber.text}','${deliveryDate.text}',0, 'denzkie')",
       );
       print('Inserted row id: ${result}');
 
