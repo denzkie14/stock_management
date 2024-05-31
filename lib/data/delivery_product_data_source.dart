@@ -44,55 +44,30 @@ class DeliveryProductDataSource extends DataGridSource {
     final Product product = controller.productList
         .firstWhere((s) => s.id == row.getCells()[0].value);
     return DataGridRowAdapter(cells: [
-      GestureDetector(
-        onTap: () {
-          _onRowTap(product);
-        },
-        child: Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.all(8.0),
-          child: Text(row.getCells()[0].value.toString()),
-        ),
+      Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.all(8.0),
+        child: Text(row.getCells()[0].value.toString()),
       ),
-      GestureDetector(
-        onTap: () {
-          _onRowTap(product);
-        },
-        child: Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.all(8.0),
-          child: Text(row.getCells()[1].value.toString()),
-        ),
+      Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8.0),
+        child: Text(row.getCells()[1].value.toString()),
       ),
-      GestureDetector(
-        onTap: () {
-          _onRowTap(product);
-        },
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(8.0),
-          child: Text(row.getCells()[2].value.toString()),
-        ),
+      Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.all(8.0),
+        child: Text(row.getCells()[2].value.toString()),
       ),
-      GestureDetector(
-        onTap: () {
-          _onRowTap(product);
-        },
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(8.0),
-          child: Text(row.getCells()[3].value.toString()),
-        ),
+      Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8.0),
+        child: Text(row.getCells()[3].value.toString()),
       ),
-      GestureDetector(
-        onTap: () {
-          _onRowTap(product);
-        },
-        child: Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.all(8.0),
-          child: Text(row.getCells()[4].value.toString()),
-        ),
+      Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.all(8.0),
+        child: Text(row.getCells()[4].value.toString()),
       ),
     ]);
   }

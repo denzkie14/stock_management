@@ -3,16 +3,18 @@ class Item {
   final String productId;
   final String name;
 
-  final num quantity;
-  final num unitPrice;
+  num quantity;
+  num unitPrice;
+  final String unit;
   final num stockOnHand;
-  final int deliveryId;
+  final String deliveryId;
   final DateTime expirationDate;
 
   Item({
     required this.productId,
     required this.name,
     required this.id,
+    required this.unit,
     required this.quantity,
     required this.unitPrice,
     required this.stockOnHand,
@@ -26,6 +28,7 @@ class Item {
       id: map['id'],
       quantity: map['quantity'],
       unitPrice: map['unitPrice'],
+      unit: map['unit'],
       stockOnHand: map['stockOnHand'],
       deliveryId: map['deliveryId'],
       expirationDate: DateTime.parse(map['expirationDate']),
@@ -40,6 +43,7 @@ class Item {
       'id': id,
       'quantity': quantity,
       'unitPrice': unitPrice,
+      'unit': unit,
       'stockOnHand': stockOnHand,
       'deliveryId': deliveryId,
       'product_id': productId,
@@ -51,6 +55,6 @@ class Item {
   // Optionally, you can override the toString method for better readability
   @override
   String toString() {
-    return 'Item{id: $id, quantity: $quantity, unitPrice: $unitPrice, stockOnHand: $stockOnHand, deliveryId: $deliveryId, expirationDate: $expirationDate}';
+    return 'Item{id: $id, quantity: $quantity,   unit: $unit, unitPrice: $unitPrice, stockOnHand: $stockOnHand, deliveryId: $deliveryId, expirationDate: $expirationDate}';
   }
 }

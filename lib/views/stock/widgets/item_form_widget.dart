@@ -80,7 +80,7 @@ class _ItemFormState extends State<ItemForm> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SizedBox(
-        width: 460,
+        width: 360,
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -88,7 +88,7 @@ class _ItemFormState extends State<ItemForm> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  widget.data.name,
+                  '${widget.data.id} - ${widget.data.name}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(
@@ -132,16 +132,20 @@ class _ItemFormState extends State<ItemForm> {
                     return null;
                   },
                 ),
-                TextFormField(
-                  readOnly: true,
-                  controller: totalAmount,
-                  decoration: const InputDecoration(labelText: 'Total Amount'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a total amount';
-                    }
-                    return null;
-                  },
+                Visibility(
+                  visible: false,
+                  child: TextFormField(
+                    readOnly: true,
+                    controller: totalAmount,
+                    decoration:
+                        const InputDecoration(labelText: 'Total Amount'),
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please enter a total amount';
+                    //   }
+                    //   return null;
+                    // },
+                  ),
                 ),
                 const SizedBox(
                   height: 16,
@@ -165,10 +169,11 @@ class _ItemFormState extends State<ItemForm> {
                               productId: widget.data.id,
                               name: widget.data.name,
                               id: 0,
+                              unit: widget.data.unit,
                               quantity: num.parse(quantity.text),
                               unitPrice: num.parse(basePrice.text),
                               stockOnHand: 0,
-                              deliveryId: 0,
+                              deliveryId: '0000',
                               expirationDate: DateTime.now());
 
                           int index = controller.itemList
@@ -179,8 +184,12 @@ class _ItemFormState extends State<ItemForm> {
                               -1) {
                             controller.itemList.add(_item);
                           } else {
-                            controller.itemList.removeRange(index, index);
-                            controller.itemList.insert(index, _item);
+                            Item newItem = controller.itemList[index];
+                            newItem.unitPrice = num.parse(basePrice.text);
+                            newItem.quantity = num.parse(basePrice.text);
+
+                            controller.itemList.removeAt(index);
+                            controller.itemList.insert(index, newItem);
                           }
 
                           Navigator.of(
@@ -220,7 +229,7 @@ class _ItemFormState extends State<ItemForm> {
                         backgroundColor: Colors.green, // Background color
                       ),
                       child: Text(
-                        widget.data == null ? 'Add' : 'Update',
+                        widget.data == null ? 'Add' : 'Add',
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),

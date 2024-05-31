@@ -230,6 +230,7 @@ class DeliveryController extends GetxController {
       if (msg is List<Product>) {
         productList.clear();
         productList.addAll(msg);
+        productList.sort((a, b) => a.id.compareTo(b.name));
         productList.refresh();
       } else {
         print('loadProducts Error: $msg');
@@ -267,6 +268,126 @@ class DeliveryController extends GetxController {
     } catch (e) {
       print('Error querying database: $e');
       sendPort.send([]);
+    }
+  }
+
+  insertItems(Delivery delivery) async {
+    MySqlConnection? conn;
+    //  isLoading(true);
+    try {
+      conn = await MySqlConnection.connect(settings);
+
+      for (Item i in itemList) {
+        if (i.id == 0) {
+          var result = await conn.query(
+            "INSERT INTO db_stocks.tbl_items (delivery_id, product_id, quantity, base_price, is_deleted) VALUES('${delivery.id}','${i.productId}',${i.quantity},${i.unitPrice},0)",
+          );
+          print('Inserted row id: ${result}');
+        } else {
+          var result = await conn.query(
+            "Update  db_stocks.tbl_items set quantity = ${i.quantity}, base_price = ${i.unitPrice} where id=${i.id}",
+          );
+          print('Inserted row id: ${result}');
+        }
+      }
+
+      hasError = false;
+      resultMessage = 'Items added successfully.';
+    } on MySqlException catch (e) {
+      if (e.errorNumber == 1062) {
+        // Handle duplicate entry error
+        print('Duplicate entry error: ${e.message}');
+        resultMessage = 'Duplicate entry error: ${e.message}';
+      } else {
+        // Handle other MySQL errors
+        print('MySQL Error: ${e.message}');
+        resultMessage = 'MySQL Error: ${e.message}';
+      }
+      hasError = true;
+    } catch (e) {
+      print('Error: $e');
+      resultMessage = 'Error: ${e.toString()}';
+      hasError = true;
+    } finally {
+      // Ensure the connection is closed
+      await conn?.close();
+      //   isLoading(false);
+    }
+  }
+
+  delteItem(Delivery delivery, Item item) async {
+    MySqlConnection? conn;
+    //  isLoading(true);
+    try {
+      conn = await MySqlConnection.connect(settings);
+
+      var result = await conn.query(
+        "Update  db_stocks.tbl_items set is_deleted = 1 where id=${item.id}",
+      );
+
+      print('Deleted row id: ${result}');
+
+      hasError = false;
+      resultMessage = 'Item Deleted successfully.';
+    } on MySqlException catch (e) {
+      if (e.errorNumber == 1062) {
+        // Handle duplicate entry error
+        print('Duplicate entry error: ${e.message}');
+        resultMessage = 'Duplicate entry error: ${e.message}';
+      } else {
+        // Handle other MySQL errors
+        print('MySQL Error: ${e.message}');
+        resultMessage = 'MySQL Error: ${e.message}';
+      }
+      hasError = true;
+    } catch (e) {
+      print('Error: $e');
+      resultMessage = 'Error: ${e.toString()}';
+      hasError = true;
+    } finally {
+      // Ensure the connection is closed
+      await conn?.close();
+      //   isLoading(false);
+    }
+  }
+
+  void loadItems(Delivery delivery) async {
+    // final port = ReceivePort();
+    //sendPort.send(port.sendPort);
+
+    try {
+      MySqlConnection conn = await MySqlConnection.connect(settings);
+      List<Item> data = <Item>[];
+      String sql =
+          "SELECT i.id, i.delivery_id, i.product_id, i.quantity, i.base_price, p.name, p.unit, p.category_id, c.category FROM db_stocks.tbl_items i left join db_stocks.tbl_products p on p.id=i.product_id	left join db_stocks.tbl_category c on c.id=p.category_id where delivery_id = '${delivery.id}' and i.is_deleted = 0";
+
+      final query1 = await conn.query(sql);
+      final query = await conn.query(sql);
+
+      for (var row in query) {
+        Item value = Item(
+          id: row[0],
+          deliveryId: row[1],
+          productId: row[2],
+          quantity: row[3],
+          unitPrice: row[4],
+          name: row[5],
+          unit: row[6],
+          expirationDate: DateTime.now(),
+          stockOnHand: 0,
+        );
+        data.add(value);
+      }
+
+      await conn.close();
+
+      itemList.clear();
+      itemList.addAll(data);
+      itemList.refresh();
+      //  sendPort.send(data);
+    } catch (e) {
+      print('Error querying database: $e');
+      // sendPort.send([]);
     }
   }
 }
